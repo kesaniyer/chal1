@@ -38,7 +38,7 @@ const recursiveMerge = (target, source) => {
 
 app.post("/leConfig", (req, res) => {
   res.cookie('token', token, {
-    httpOnly: false,     // ✅ Critical: blocks JS access
+    httpOnly: true,     // ✅ Critical: blocks JS access
     secure: false,      // Set to `true` in production (requires HTTPS)
     sameSite: 'Strict', // ✅ Prevents CSRF
     maxAge: 3600000     // 1 hour
