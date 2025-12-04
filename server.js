@@ -53,7 +53,7 @@ function isSorted(arr) {
     }
     return true;
 }
-const b_url = "/benchmark?url=http://localhost:${PORT}/benchmark?internal=flag";
+const b_url = `/benchmark?url=http://localhost:${PORT}/benchmark?internal=flag`;
 app.get('/api/benchmark/url', (req, res) => {
     res.json({ url: b_url });
 });
@@ -134,7 +134,7 @@ app.post('/api/reset', (req, res) => {
 });
 
 app.post('/api/benchmark', (req, res) => {
-    const targetUrl = "http://localhost:${PORT}/benchmark?internal=flag";
+    const targetUrl = `http://localhost:${PORT}/benchmark?internal=flag`;
     
     axios.get(targetUrl)
         .then(() => res.status(200).end())
@@ -196,7 +196,7 @@ app.get('/benchmark', async (req, res) => {
         return res.status(400).send('URL required');
     }
 
-    if (targetUrl === 'http://localhost:${PORT}/benchmark?internal=flag') {
+    if (targetUrl === `http://localhost:${PORT}/benchmark?internal=flag`) {
         return res.send("It should be hiding here somewhere...");
     }
 
