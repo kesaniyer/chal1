@@ -205,7 +205,7 @@ app.get('/benchmark', async (req, res) => {
         return res.status(403).send('Benchmark failed - could not connect to server');
     }
     if (targetUrl.includes('internal')) {
-        return res.status(403).send('Forbidden internal keyword used');
+        return res.status(403).send('Benchmark failed - Forbidden internal keyword used');
     }
 
     try {
@@ -214,7 +214,7 @@ app.get('/benchmark', async (req, res) => {
     } catch (error) {
         console.log("Error details - ", error.message); 
         if (error.code) console.log("Error code - ", error.code);
-        res.status(500).send('Benchmark failed: Could not connect to target resource');
+        res.status(500).send('Benchmark failed - Wrong loopback address used');
     }
 
 });
