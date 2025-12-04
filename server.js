@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 3000;
 const flag = "Pctf{L!qU1d_H3L1um_";
 const LOG_PATH = "C:\\Windows\\Log\\systemRestore"; 
 
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'includes'))); 
 
@@ -43,7 +44,10 @@ app.use(session({
     secret: 'pctf', 
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } 
+    cookie: { 
+      secure: true,
+      sameSite: 'None'
+} 
 }));
 
 function isSorted(arr) {
@@ -143,8 +147,8 @@ app.post('/api/benchmark', (req, res) => {
 app.post("/leConfig", (req, res) => {
   res.cookie('token', token, {
     httpOnly: false,     
-    secure: false,      
-    sameSite: 'Strict'
+    secure: true,      
+    sameSite: 'None'
   });
   res.end();
 })
