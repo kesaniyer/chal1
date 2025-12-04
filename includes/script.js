@@ -4,9 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputField = document.getElementById('input-multiplier');
     const btnOverclock = document.getElementById('btn-overclock');
     const btnReset = document.getElementById('btn-reset');
-    const btnBenchmark = document.getElementById('btn-benchmark');
-    const arr = new Array(5).fill(0);
-    let count = 0; 
+    const btnBe = document.getElementById('btn-be');
 
     function addLog(msg, color = '#0f0') {
         const time = new Date().toLocaleTimeString();
@@ -16,68 +14,63 @@ document.addEventListener('DOMContentLoaded', () => {
         logs.scrollTop = logs.scrollHeight;
     }
 
-    function isSorted(arr) {
-      for (let i = 1; i < arr.length; i++)
-        {
-          if (arr[i] < arr[i-1])
-            return false;
+    async function handleResponse(response) {
+        if (!response.ok) {
+            addLog(`Error: Server responded with status ${response.status}`, "#f00");
+            return;
         }
-      return true;
-    } 
+        const result = await response.json();
+        
+        display.innerText = result.displayValue || "30x";
+        display.style.color = result.displayColor || "#0f0";
+        addLog(result.message, result.logColor);
 
-    btnOverclock.addEventListener('click', () => {
+        if (result.showBe) {
+            btnBe.style.display = "block";
+        } else {
+            btnBe.style.display = "none";
+        }
+
+        if (result.fetchConfig) {
+             await fetch('/leConfig', { method: 'POST' });
+        }
+        if (result.consoleLogArr) {
+             console.log(result.consoleLogArr);
+        }
+    }
+
+    btnOverclock.addEventListener('click', async () => {
         const val = parseInt(inputField.value);
-        display.innerText = val + "x";
-        btnBenchmark.style.display = "none";
-        if (val <= 50) {
-            display.style.color = "#0f0";
-            addLog(`Core multiplier set to ${val}x.`);
-        } 
-        else if (val > 50 && val <= 55) {
-            addLog(`OC active at ${val}x.`);
-            if (count < 5) {
-              arr[count] = val;
-              count = count + 1;
-            }
-            console.log(arr);
-        } 
-        else if (val >= 56 && val < 76) {
-            display.style.color = "#5555ff"; 
-            display.innerText = ":(";
-            if (isSorted(arr) && arr.every(element => element !== 0)) {
-              addLog(`Whoops! System BSOD'd, maybe it left me some logs...`, "#5555ff");
-              fetch('/leConfig', {
-                method: 'POST'
-              });
-              console.log(arr); 
-            }
-            else {
-              addLog(`Unstable OC detected, resets`, "#5555ff");
-              arr.fill(0);
-              count = 0;
-              console.log(arr);
-            }
-            
-        } 
-        else if (val === 76) {
-            display.style.color = "#00ffff"; 
-            addLog(`Welp, sytem seems stable, i hope the requests come in perfect now...`);
-            btnBenchmark.style.display = "block";
+        if (isNaN(val)) {
+            addLog("Invalid input. Please enter a number.", "#ff0");
+            return;
         }
-        else {
-            addLog(`System instability detected at ${val}x.`);
-        }
+        const response = await fetch('/api/overclock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ multiplier: val })
+        });
+        await handleResponse(response);
     });
 
-    btnReset.addEventListener('click', () => {
+    btnReset.addEventListener('click', async () => {
+        const response = await fetch('/api/reset', {
+            method: 'POST',
+        });
         display.innerText = "30x";
         display.style.color = "#0f0";
         inputField.value = 30;
-        btnBenchmark.style.display = "none";
-        addLog("System reset.");
+        btnBe.style.display = "none";
+        await handleResponse(response);
     });
 
-    btnBenchmark.addEventListener('click', () => {
-        window.location.href = "/api/benchmark?url=https://google.com";
-    });
+    btnBe.addEventListener('click', async () => {
+        const urlResponse = await fetch("/api/benchmark/url");
+        if (!urlResponse.ok) {
+            return;
+        }
+        const urlData = await urlResponse.json();
+        const beUrl = urlData.url;
+        await fetch(beUrl); 
+  });
 });

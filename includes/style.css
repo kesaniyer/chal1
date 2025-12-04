@@ -107,10 +107,10 @@ button:hover {
     color: #000;
 }
 
-#btn-benchmark {
+#btn-be {
     border-color: #ff00ff;
     color: #ff00ff;
 }
-#btn-benchmark:hover {
+#btn-be:hover {
     background: #ff00ff;
 }
